@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Start Page</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <script>
+            
+        var width = 0;
+        var height = 0;
+            
+        function hex2(c) {
+            c = Math.round(c);
+            if (c < 0) c = 0;
+            if (c > 255) c = 255;
+
+            var s = c.toString(16);
+            if (s.length < 2) s = "0" + s;
+
+            return s;
+        }
+
+        function color(r, g, b) {
+            return "#" + hex2(r) + hex2(g) + hex2(b);
+        }
+
+        function shade(col, light) {
+
+            // TODO: Assert that col is good and that -1 < light < 1
+
+            var r = parseInt(col.substr(1, 2), 16);
+            var g = parseInt(col.substr(3, 2), 16);
+            var b = parseInt(col.substr(5, 2), 16);
+
+            if (light < 0) {
+                r = (1 + light) * r;
+                g = (1 + light) * g;
+                b = (1 + light) * b;
+            } else {
+                r = (1 - light) * r + light * 255;
+                g = (1 - light) * g + light * 255;
+                b = (1 - light) * b + light * 255;
+            }
+
+            return color(r, g, b);
+        }
+        
+        function generateShades(){
+            let widthPxl = document.getElementById("width").value;
+            let heightPxl = document.getElementById("height").value;
+            let themeColors = document.getElementById("themeColors");
+            let themeSVG = document.getElementById("themeSVG");
+            let svgColumn = document.getElementById("svgColumn");
+            let colors = themeColors.value.split("\n");
+            let index = 0;
+            let svg = "";
+            width = parseInt(widthPxl);
+            height = colors.length * 2 * parseInt(heightPxl);
+            console.log("COUNT : " + colors.length);
+            for(var i in colors){
+                console.log(colors[i] + " - " + shade("#" + colors[i],0.4));
+                let y = index * parseInt(heightPxl);
+                let svg1 = "\n<rect x=\"0\" y=\"" + y + "\" width=\"" + widthPxl + "px\" height=\"" + heightPxl + "px\" fill=\"#" + colors[i].trim() + "\"/>";
+                svg += svg1;
+                index++;
+                y = y + parseInt(heightPxl);
+                let svg2 = "\n<rect x=\"0\" y=\"" + y + "\" width=\"" + widthPxl + "px\" height=\"" + heightPxl + "px\" fill=\"" + shade("#"+colors[i].trim(),0.4) + "\"/>";
+                svg += svg2;
+                index++;
+            }
+            let start = "<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"svgPalette\" height=\"" + height + "px\" width=\"1px\">";
+            let end = "\n</svg>";
+            themeSVG.value = start + svg + end;
+            svgColumn.innerHTML = themeSVG.value;
+            setTimeout(scaleSvg, 1000);
+        }
+        
+        function scaleSvg(){
+            console.log("HEIGHT : " + height);
+            var svgPalette = document.getElementById('svgPalette');
+            svgPalette.setAttribute("width",width);
+            svgPalette.setAttribute("height",height);
+        }
+        </script>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <td colspan="3">
+                    This is used to loop through the JQuery Theme colors (as already pasted into the left text area) and when generating the SVG (to be imported into gimp as layers)<br/>
+                    must have the width and height remain as 1px to generate the correct size SVG of 1 pixel per color. Once the palette file namely COLOR_PALETTE.svg is generated<br/>
+                    it is used as the color palette to color the image templates namely 32px.png and 40px.png by using the scavecgraph-jstreethemes project.
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    Width : <input type="text" id="width" value="1" style="width:20px;"/> Height : <input type="text" id="height" value="1" style="width:20px;"/>
+                    <button value="generateShades" onclick="generateShades();">Generate Shades</button>
+                </td> 
+            </tr>
+            <tr>
+                <td style="vertical-align: top;padding-left:10px;">
+<textarea id="themeColors" rows="70" cols="10" style="font-size:8px;">
+000000
+696969
+808080
+708090
+483d8b
+6a5acd
+191970
+00008b
+0000cd
+0000ff
+4169e1
+6495ed
+1e90ff
+4682b4
+00bfff
+87ceeb
+008b8b
+5f9ea0
+0178af
+2f4f4f
+556b2f
+8fbc8f
+228b22
+008000
+6b8e23
+2e8b57
+008080
+40e0d0
+00ced1
+9acd32
+bdb76b
+808000
+deb887
+d2b48c
+b8860b
+daa520
+bc8f8f
+d2691e
+cd853f
+ff7f50
+ff8c00
+ffa500
+f4a460
+e9967a
+8b4513
+a0522d
+a52a2a
+cd5c5c
+f08080
+4b0082
+663399
+8b008b
+800080
+8a2be2
+9400d3
+9932cc
+da70d6
+ee82ee
+ff69b4
+ff1493
+db7093
+ff00ff
+800000
+8b0000
+b22222
+dc143c
+ff0000
+ff4500
+ff6347
+fa8072</textarea>                    
+                </td>
+                <td style="vertical-align: top;padding-left:10px;">
+                    <textarea id="themeSVG" rows="70" cols="70" style="font-size:8px;"></textarea>
+                </td>
+                <td id="svgColumn" style="vertical-align: top;padding-left:10px;">
+                    
+                </td>
+            </tr>
+        </table>
+
+    </body>
+</html>
